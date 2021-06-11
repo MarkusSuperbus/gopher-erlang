@@ -36,10 +36,10 @@ list_folder(Socket, BinaryPath) ->
                  "." -> "";
                  Path -> Path ++ "/"
                end,
-      erlang:display(Prefix),
-      erlang:display(Path), 
-      erlang:display(Filenames), 
-      ResponseAsString = lists:flatten([check_item_type(Prefix++F) ++ Prefix++F ++ "\r\n" || F <- Filenames]),
+      ResponseAsString = 
+        lists:flatten([check_item_type(Prefix++F) ++ Prefix++F ++ "\t" 
+                       ++ Prefix++F ++ "\t" ++ integer_to_list(?PORT) ++ "\r\n" 
+                       || F <- Filenames]),
       gen_tcp:send(Socket, list_to_binary(ResponseAsString ++ ".\r\n"));
     {error, enotdir} -> serve_file(Socket, Path)
   end.
