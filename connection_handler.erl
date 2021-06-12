@@ -26,9 +26,14 @@ list_folder(Socket, BinaryPath) ->
                  "." -> "";
                  Path -> Path ++ "/"
                end,
+      TypeAndUserName = fun (F) -> check_item_type(Prefix++F)++Prefix++F end,
+      Selector = fun(F) -> Prefix++F end,
+      Host = "127.0.0.1",
       ResponseAsString = 
-        lists:flatten([check_item_type(Prefix++F) ++ Prefix++F ++ "\t" 
-                       ++ Prefix++F ++ "\t" ++ integer_to_list(?PORT) ++ "\r\n" 
+        lists:flatten([lists:join("\t", [TypeAndUserName(F),
+                                        Selector(F),
+                                        Host,
+                                        integer_to_list(?PORT)]) ++ "\r\n" 
                        || F <- Filenames]),
       gen_tcp:send(Socket, list_to_binary(ResponseAsString ++ ".\r\n"));
     {error, enotdir} -> serve_file(Socket, Path)
