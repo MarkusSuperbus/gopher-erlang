@@ -8,12 +8,13 @@ handle(Socket) ->
   {ok, BinaryMessage} = gen_tcp:recv(Socket, 0),
   erlang:display(BinaryMessage),
   case BinaryMessage of
-    <<".\r\n">> -> gen_tcp:close(Socket);
-    <<"\r\n">> -> list_folder(Socket, <<".">>), handle(Socket);
+    <<".\r\n">> -> noop;
+    <<"\r\n">> -> list_folder(Socket, <<".">>);
     BinaryMessage -> 
       StrippedMessage = binary:part(BinaryMessage, {0, byte_size(BinaryMessage) - 2}),
-      list_folder(Socket, StrippedMessage), handle(Socket)
-  end.
+      list_folder(Socket, StrippedMessage)
+  end,
+  gen_tcp:close(Socket).
 
 list_folder(Socket, BinaryPath) ->
   Path = binary:bin_to_list(BinaryPath),
