@@ -1,4 +1,4 @@
--module(minimal).
+-module(gopher_server).
 -export([listen/0]).
 
 -define(PORT, 1025).
