@@ -24,8 +24,25 @@ to be easily employable.
 
 ### Installation
 
-- You will need a working version of Erlang installed.
-- rebar3 
+The server depends on Erlang/OTP and rebar3 and is aimed at
+Linux systems (for now).
+
+
+You will need a working version of Erlang installed.
+Open a shell in the root directory of the repository and
+execute
+```
+rebar3 compile
+```
+to build.
+To employ call
+```
+rebar3 shell
+```
+You will be left with an erlang shell with a process started listening
+to the specified port. Note that you need elevated rights when
+running the server on port 70 (standard).
+
 - Looks for configuration in ???
 - 
 
@@ -54,3 +71,5 @@ The Gopher Protocol is inherently insecure. The communication between client and
 ## Where The Project is Going
 
 - Server side scripting without complicating the configuration for static sites.
+- Support other OSes
+- Linux Service
