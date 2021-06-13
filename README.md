@@ -25,17 +25,27 @@ to be easily employable.
 ### Installation
 
 - You will need a working version of Erlang installed.
-- rebar3 is highly recommended
+- rebar3 
+- Looks for configuration in ???
+- 
 
 ### Hot Updates
 
 
-## Where Users can Get Help with Your Project
+## I need help, what should I do?
 
-- Email ?
-- Github Issue?
+Open a Github Issue with an expressive title and a
+description of your problem.
 
-## Who Maintains and Contributes to the Project
+## Contribution Guide
+
+There is no fixed code guidelines (for now). Avoid long lines, 
+meaningless names and other bad coding practices.
+
+Bug reports are welcome, please use the 
+
+Before starting to work on a feature (which you want on this
+repository)  it is probably best to open an issue beforehand.
 
 ## Beware
 
