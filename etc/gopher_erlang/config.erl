@@ -1,1 +1,2 @@
-{index, "/var/gopher_erlang/gophermap"}.
+{index, "gophermap"}.
+{root_path, "/var/gopher_erlang/"}.
