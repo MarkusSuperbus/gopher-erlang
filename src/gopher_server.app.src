@@ -1,0 +1,13 @@
+{application, gopher_server,
+ [{description, "A Gopher Server written in Erlang"},
+  {vsn, "0.0.0"},
+  {registered, []},
+  {mod, {gopher_server_app, []}},
+  {applications,
+   [kernel,
+    stdlib
+   ]},
+  {licenses, []},
+  {env,[]},
+  {modules, []}
+]}.
