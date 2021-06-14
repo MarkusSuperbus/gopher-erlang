@@ -4,50 +4,53 @@
 
 -include_lib("kernel/include/file.hrl").
 
+-define(CONFIG_DIRECTORY_1, "/etc/gopher_erlang/config.erl").
+
+check_configuration_locations() ->
+  case file:read_file_info(?CONFIG_DIRECTORY_1) of
+    {ok, _FileInfo} -> {ok, Terms} = file:consult(?CONFIG_DIRECTORY_1),
+                      dict:from_list(Terms)
+  end.
+
 handle(Socket) -> 
+  Parameters = check_configuration_locations(),
   {ok, BinaryMessage} = gen_tcp:recv(Socket, 0),
-  erlang:display(BinaryMessage),
   case BinaryMessage of
     <<".\r\n">> -> noop;
-    <<"\r\n">> -> list_folder(Socket, <<".">>);
+    <<"\r\n">> -> {ok, SelectedFile} = absolute_path(<<"">>, Parameters),
+                  serve_file(Socket, SelectedFile)
+                  ;
     BinaryMessage -> 
       StrippedMessage = binary:part(BinaryMessage, {0, byte_size(BinaryMessage) - 2}),
-      list_folder(Socket, StrippedMessage)
+      {ok, SelectedFile} = absolute_path(StrippedMessage, Parameters),
+      serve_file(Socket, SelectedFile)
   end,
   gen_tcp:close(Socket).
 
-list_folder(Socket, BinaryPath) ->
+absolute_path(BinaryMessage, Parameters) ->
+  erlang:display(BinaryMessage),
+  BinaryPath = BinaryMessage,
   Path = binary:bin_to_list(BinaryPath),
-  % I don't like this error-driven
-  % branching. But it suffices for now.
-  case file:list_dir(Path) of
-    {ok, Filenames} -> 
-      Prefix = case Path of
-                 "." -> "";
-                 Path -> Path ++ "/"
-               end,
-      TypeAndUserName = fun (F) -> check_item_type(Prefix++F)++Prefix++F end,
-      Selector = fun(F) -> Prefix++F end,
-      Host = "127.0.0.1",
-      ResponseAsString = 
-        lists:flatten([lists:join("\t", [TypeAndUserName(F),
-                                        Selector(F),
-                                        Host,
-                                        integer_to_list(?PORT)]) ++ "\r\n" 
-                       || F <- Filenames]),
-      gen_tcp:send(Socket, list_to_binary(ResponseAsString ++ ".\r\n"));
-    {error, enotdir} -> serve_file(Socket, Path)
-  end.
-
-check_item_type(FullPath) ->
-  {ok, FileInfo} = file:read_file_info(FullPath),
-  case FileInfo#file_info.type of
-    regular -> "0";
-    directory -> "1"
-  end.
+  % I think there is the possibility to break out
+  % of the root_path at the moment (I don't check if
+  % an absolute path is given).
+  {ok, RootPath} = dict:find(root_path, Parameters),
+  erlang:display(Path),
+  erlang:display(RootPath),
+  AbsolutePath = filename:join(RootPath, Path),
+  erlang:display(AbsolutePath),
+  {ok, FileInfo} = file:read_file_info(AbsolutePath),
+  SelectedFile = case FileInfo#file_info.type of
+    directory -> {ok, Index} = dict:find(index, Parameters),
+                 filename:join(AbsolutePath, Index);
+    _ -> AbsolutePath
+  end,
+  erlang:display(SelectedFile),
+  {ok, SelectedFile}.
 
 serve_file(Socket, Path) -> 
   {ok, BinaryContents} = file:read_file(Path),
-  gen_tcp:send(Socket, BinaryContents).
+  gen_tcp:send(Socket, BinaryContents),
+  gen_tcp:send(Socket, ".\r\n").
 
 
