@@ -3,3 +3,4 @@ Usually it is located in /var/gopher-erlang/gophermap -
 but you can change the default folder in /etc/gopher-erlang/config.erl .
 
 1Gopherpedia - A Gopher Interface to Wikipedia	/	gopherpedia.com	70
+ILetter A	images/A.png	localhost	1025
