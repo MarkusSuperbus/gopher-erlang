@@ -1,19 +1,16 @@
 -module(connection_handler).
 -export([handle/1]).
--define(PORT, 1025).
 
 -include_lib("kernel/include/file.hrl").
 
--define(CONFIG_DIRECTORY_1, "/etc/gopher_erlang/config.erl").
+-define(CONFIG_DIRECTORY_1, "/etc/gopher_erlang/handler_config.erl").
 
-check_configuration_locations() ->
-  case file:read_file_info(?CONFIG_DIRECTORY_1) of
-    {ok, _FileInfo} -> {ok, Terms} = file:consult(?CONFIG_DIRECTORY_1),
-                      dict:from_list(Terms)
-  end.
+read_handler_config() ->
+    {ok, Terms} = file:consult(?CONFIG_DIRECTORY_1),
+    dict:from_list(Terms).
 
 handle(Socket) -> 
-  Parameters = check_configuration_locations(),
+  Parameters = read_handler_config(),
   {ok, BinaryMessage} = gen_tcp:recv(Socket, 0),
   case BinaryMessage of
     <<".\r\n">> -> noop;

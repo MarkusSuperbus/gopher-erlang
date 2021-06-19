@@ -1,2 +1,1 @@
-{index, "gophermap"}.
-{root_path, "/var/gopher_erlang/"}.
+{port , 1042}.

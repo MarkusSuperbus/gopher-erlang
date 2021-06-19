@@ -1,12 +1,18 @@
 -module(gopher_server).
 -export([listen/0]).
 
--define(PORT, 1025).
+-define(CONFIG_DIRECTORY_1, "/etc/gopher_erlang/config.erl").
+
+read_main_config() ->
+  {ok, Terms} = file:consult(?CONFIG_DIRECTORY_1),
+  dict:from_list(Terms).
 
 listen() ->
+  Parameters = read_main_config(),  
+  {ok, Port} = dict:find(port, Parameters),
   spawn(fun() ->
-              {ok, ListenSocket} = gen_tcp:listen(?PORT, [binary, {packet, 0}, 
-                                                          {active, false}]),
+              {ok, ListenSocket} = gen_tcp:listen(Port, [binary, {packet, 0},
+                                                        {active, false}]),
               loop(ListenSocket)
         end).
 
